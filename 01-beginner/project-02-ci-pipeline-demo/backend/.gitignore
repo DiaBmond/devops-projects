@@ -24,3 +24,15 @@ local_settings.py
 .vscode/
 .idea/
 *.swp
+
+# Test coverage
+.coverage
+htmlcov/
+coverage/
+.pytest_cache/
+
+# Test results
+.tox/
+.coverage.*
+coverage.xml
+*.cover
