@@ -37,6 +37,13 @@ jobs:
           cd 01-beginner/project-02-ci-pipeline-demo/backend
           pytest
 
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: 01-beginner/project-02-ci-pipeline-demo/backend/htmlcov/
+
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
@@ -61,6 +68,13 @@ jobs:
         run: |
           cd 01-beginner/project-02-ci-pipeline-demo/frontend
           npm test
+
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: 01-beginner/project-02-ci-pipeline-demo/frontend/coverage/
 
   build:
     name: Build Docker Images
