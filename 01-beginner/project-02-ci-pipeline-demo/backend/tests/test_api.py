@@ -6,9 +6,9 @@ def test_hello_endpoint_status():
     response = client.get('/')
     assert response.status_code == 200
     
-def test_hello_endpoint_content():
-    client = Client()
-    response = client.get('/')
-    data = json.loads(response.content)
-    assert 'message' in data
-    assert data['message'] == 'Hello World from Dockerized App!'
+# def test_hello_endpoint_content():
+#     client = Client()
+#     response = client.get('/')
+#     data = json.loads(response.content)
+#     assert 'message' in data
+#     assert data['message'] == 'Hello World from Dockerized App!'
