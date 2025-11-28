@@ -5,13 +5,13 @@ on:
     branches: [main]
     paths:
       - "01-beginner/project-02-ci-pipeline-demo/**"
-      - ".github/workflows/project02/ci-project-02.yml"
+      - ".github/workflows/ci-project-02.yml"
 
   pull_request:
     branches: [main]
     paths:
       - "01-beginner/project-02-ci-pipeline-demo/**"
-      - ".github/workflows/project02/ci-project-02.yml"
+      - ".github/workflows/ci-project-02.yml"
 
 jobs:
   test-backend:
