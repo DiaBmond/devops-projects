@@ -16,7 +16,7 @@ This project builds upon [Project 1: Docker Hello App](../project-01-docker-hell
 
 ---
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 After completing this project, you will understand:
 

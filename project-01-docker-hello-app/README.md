@@ -5,7 +5,7 @@
 ![Node](https://img.shields.io/badge/node-20.x-green)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## 📋 Overview
+## Overview
 
 A beginner-level DevOps project demonstrating **containerization fundamentals** using Docker. This project serves as the foundation for the entire DevOps learning journey.
 
@@ -18,7 +18,7 @@ A beginner-level DevOps project demonstrating **containerization fundamentals** 
 
 ---
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 After completing this project, you will understand:
 
