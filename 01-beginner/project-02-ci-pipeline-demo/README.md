@@ -1,85 +1,131 @@
-# Project 2: CI Pipeline with GitHub Actions 
+# Project 2: CI/CD Pipeline with GitHub Actions
 
 ![CI Pipeline](https://github.com/DiaBmond/devops-projects/actions/workflows/project02-ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Node](https://img.shields.io/badge/node-20.x-green)
+![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## Overview
 
-Automated CI/CD pipeline demonstrating continuous integration, automated testing, and Docker builds using GitHub Actions.
+A production-grade **Continuous Integration pipeline** demonstrating automated testing, code quality checks, and Docker builds using **GitHub Actions**.
 
-This project builds upon [Project 1](../project-01-docker-hello-app) by adding automated testing and deployment workflows.
+This project builds upon [Project 1: Docker Hello App](../project-01-docker-hello-app) by adding automated workflows that run on every code push.
+
+**Learning Path**: This is **Project 2 of 10** in the DevOps Roadmap (Stage 1: Beginner).
+
+---
+
+## 🎯 Learning Objectives
+
+After completing this project, you will understand:
+
+- GitHub Actions workflow syntax and structure
+- Multi-job pipelines with dependencies
+- Automated testing in CI environment
+- Test coverage measurement and reporting
+- Build automation strategies
+- Fail-fast patterns (test → build)
+- Artifact management
+- Caching strategies for faster builds
+- CI/CD best practices
+
 
 ---
 
 ## Features
 
-- **Automated Testing**: Backend (pytest) and Frontend (Jest) tests run on every push
-- **Docker Builds**: Automated image building after tests pass
-- **Fast Pipeline**: Complete CI cycle in ~1 minute
-- **Job Dependencies**: Build only runs if all tests pass (fail-fast)
-- **Caching**: npm packages cached for faster builds
-- **Coverage Reports**: Test coverage artifacts uploaded on every run
-- **Status Badge**: Real-time CI status visible in README
+### Automated Testing
+- **Backend**: pytest with pytest-django and coverage
+- **Frontend**: Jest with React Testing Library
+- **Coverage Reports**: Automatically generated and uploaded
+
+### Docker Automation
+- Automated image builds after tests pass
+- Multi-stage Dockerfile validation
+- Tagged with commit SHA for traceability
+
+### Visibility
+- Real-time CI status badge
+- Detailed logs for debugging
+- Downloadable test coverage reports
+- Job dependency visualization
 
 ---
 
-## Skills Learned
+## Quick Start
 
-### CI/CD Concepts
-- GitHub Actions fundamentals (workflows, jobs, steps)
-- Workflow triggers (push, pull_request)
-- Job dependencies with `needs`
-- Automated testing in CI environment
-- Build automation
-- Artifact management
+### Prerequisites
 
-### Testing
-- Backend: pytest with pytest-django
-- Frontend: Jest with React Testing Library
-- Test coverage measurement and reporting
-- Writing unit tests for APIs and components
+- Git and GitHub account
+- Docker Desktop (for local testing)
+- Python 3.12+ (for local dev)
+- Node.js 20+ (for local dev)
 
-### DevOps Best Practices
-- Fail-fast pipelines (test before build)
-- Caching strategies for faster builds
-- Status badges for visibility
-- Clean separation of test and build stages
-- Deterministic builds with npm ci
+### 1. Clone and Setup
 
-### YAML & Configuration
-- GitHub Actions workflow syntax
-- Multi-job workflows
-- Environment setup (Python, Node.js)
-- Action marketplace usage
+```bash
+# Clone repository
+git clone https://github.com/DiaBmond/devops-projects.git
+cd devops-projects/project-02-ci-pipeline-demo
+
+# Run with Docker Compose
+docker-compose up --build
+```
+
+### 2. Trigger CI Pipeline
+
+```bash
+# Make a change
+echo "# Test" >> README.md
+
+# Commit and push
+git add .
+git commit -m "test: trigger CI pipeline"
+git push origin main
+```
+
+### 3. Monitor Pipeline
+
+1. Go to **GitHub Actions** tab in your repository
+2. Click on the latest workflow run
+3. Watch jobs execute in real-time
+4. Download test coverage artifacts
 
 ---
 
-## How to Run Tests Locally
+## Running Tests Locally
 
 ### Backend Tests
+
 ```bash
-# Navigate to backend
 cd backend
 
-# Install dependencies
-pip install -r requirements.txt -r requirements-dev.txt
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate
 
-# Run tests
+# Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+# Run all tests
 pytest
 
 # Run with coverage
 pytest --cov
 
+# Run specific test file
+pytest tests/test_api.py -v
+
 # Generate HTML coverage report
 pytest --cov --cov-report=html
-open htmlcov/index.html  # View detailed report
+open htmlcov/index.html
 ```
 
 ### Frontend Tests
+
 ```bash
-# Navigate to frontend
 cd frontend
 
 # Install dependencies
@@ -91,155 +137,209 @@ npm test
 # Run with coverage
 npm test -- --coverage
 
+# Run in watch mode (development)
+npm test -- --watch
+
+# Run specific test file
+npm test -- App.test.tsx
+
 # View coverage report
-open coverage/lcov-report/index.html
+open coverage/lcov-report/index.html  # macOS
+# start coverage/lcov-report/index.html  # Windows
 ```
 
 ---
 
-## CI/CD Pipeline
+## CI/CD Workflow Details
 
-This project uses **GitHub Actions** for continuous integration.
+### Workflow File: `.github/workflows/project02-ci.yml`
 
-### Workflow Jobs
+### Pipeline Stages Explained
 
-#### Job 1: Test Backend
-- Setup Python 3.12
-- Install dependencies (requirements.txt + requirements-dev.txt)
-- Run pytest with coverage
-- Upload coverage report as artifact
+#### Stage 1: Test Backend (14 seconds)
+1. **Checkout code** - Get latest commit
+2. **Setup Python** - Install Python 3.12
+3. **Install dependencies** - pip install requirements
+4. **Run pytest** - Execute all backend tests
+5. **Generate coverage** - Create HTML report
+6. **Upload artifact** - Store coverage report
 
-#### Job 2: Test Frontend
-- Setup Node.js 20
-- Install dependencies (npm ci with caching)
-- Run Jest tests with coverage
-- Upload coverage report as artifact
+#### Stage 2: Test Frontend (21 seconds)
+1. **Checkout code** - Get latest commit
+2. **Setup Node.js** - Install Node.js 20
+3. **Restore cache** - Load cached npm packages
+4. **Install dependencies** - npm ci
+5. **Run Jest** - Execute all frontend tests
+6. **Generate coverage** - Create HTML report
+7. **Upload artifact** - Store coverage report
 
-#### Job 3: Build Docker Images
-- Waits for both test jobs to pass (`needs`)
-- Build backend Docker image
-- Build frontend Docker image
-- Tag with commit SHA
-
-### What Gets Tested
-
-**Backend:**
-- API endpoint responses (status codes, JSON structure)
-- Health check endpoint
-- Django application initialization
-
-**Frontend:**
-- Component rendering
-- Text content display
-- Application structure
-
-**Infrastructure:**
-- Docker image builds (backend + frontend)
-- Multi-stage Dockerfile validation
-
-### Pipeline Performance
-
-- **Total Duration**: ~1 minute 6 seconds ⚡
-- **Test Backend**: 14 seconds
-- **Test Frontend**: 21 seconds
-- **Build Images**: 40 seconds
+#### Stage 3: Build Docker Images (40 seconds)
+1. **Wait for tests** - Only runs if both tests pass
+2. **Checkout code** - Get latest commit
+3. **Build backend** - docker build with SHA tag
+4. **Build frontend** - docker build with SHA tag
 
 ---
 
-## Running the Application Locally
+## What You Learned
 
-### With Docker Compose
-```bash
-# Start all services
-docker-compose up --build
+### CI/CD Concepts
 
-# Access services
-Frontend: http://localhost:3000
-Backend:  http://localhost:8000
-```
+- **Continuous Integration**: Automatically test every code change
+- **Pipeline as Code**: Workflows defined in YAML
+- **Job Dependencies**: Using `needs` to create workflow stages
+- **Fail-Fast**: Stop pipeline early if tests fail
+- **Artifacts**: Storing and downloading build outputs
 
-### Without Docker
+### GitHub Actions Specifics
 
-**Backend:**
-```bash
-cd backend
-pip install -r requirements.txt
-python manage.py runserver
-```
+- **Workflow triggers**: `on: push`, `on: pull_request`
+- **Job matrix**: Running tests in parallel
+- **Actions marketplace**: Reusing community actions
+- **Caching**: Speeding up builds with `cache`
+- **Secrets management**: Secure credential handling
 
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm start
-```
+### Testing Best Practices
+
+- **Backend Testing**: pytest for Python/Django
+- **Frontend Testing**: Jest + React Testing Library
+- **Coverage Metrics**: Measuring code coverage
+- **Test Isolation**: Tests don't depend on each other
+- **Assertions**: Checking expected behavior
+
+### DevOps Principles
+
+**Automation**: Manual testing → Automated testing  
+**Feedback Loop**: Fast failure detection  
+**Reproducibility**: Same tests run locally and in CI  
+**Visibility**: Status badges and logs  
+**Quality Gates**: Tests must pass before build  
 
 ---
 
 ## Viewing Test Coverage Reports
 
-After CI runs, you can download coverage reports:
+### Option 1: Download from GitHub
 
 1. Go to **GitHub Actions** tab
 2. Click on any workflow run
 3. Scroll to **Artifacts** section
-4. Download `backend-coverage` or `frontend-coverage`
-5. Extract and open `index.html`
+4. Download:
+   - `backend-coverage.zip` 
+   - `frontend-coverage.zip`
+5. Extract and open `index.html` in browser
+
+### Option 2: Generate Locally
+
+```bash
+# Backend
+cd backend
+pytest --cov --cov-report=html
+open htmlcov/index.html
+
+# Frontend
+cd frontend
+npm test -- --coverage
+open coverage/lcov-report/index.html
+```
 
 ---
 
 ## Troubleshooting
 
-### CI Pipeline Fails
+### Pipeline Fails: Backend Tests
 
-**Backend test fails:**
+**Error:**
+```
+ModuleNotFoundError: No module named 'pytest'
+```
+
+**Solution:**
 ```bash
-# Check if tests pass locally first
-cd backend
-pytest -v
-
-# Common issues:
-# - Missing dependencies in requirements-dev.txt
-# - Django settings not configured for tests
-# - Import errors (check PYTHONPATH)
+# Add pytest to requirements-dev.txt
+echo "pytest" >> backend/requirements-dev.txt
+echo "pytest-django" >> backend/requirements-dev.txt
+echo "pytest-cov" >> backend/requirements-dev.txt
+git add backend/requirements-dev.txt
+git commit -m "fix: add test dependencies"
+git push
 ```
 
 ---
 
-## What's Next?
+### Pipeline Fails: Frontend Tests
 
-### Potential Enhancements
+**Error:**
+```
+npm ERR! Cannot find module 'jest'
+```
 
-- 🔄 **Add linting**: ESLint for frontend, Black/Flake8 for backend
-- 🔐 **Security scanning**: Trivy or Snyk for vulnerability detection
-- 📊 **Code quality**: SonarQube or CodeClimate integration
-- 🚀 **Deploy stage**: Auto-deploy to staging on success
-- 🐳 **Push images**: Upload to Docker Hub or GitHub Container Registry
-- 📧 **Notifications**: Slack/Discord alerts on failures
-- 🔀 **Branch protection**: Require CI to pass before merge
-- 🎯 **Matrix testing**: Test multiple Python/Node versions
+**Solution:**
+```bash
+cd frontend
+npm install --save-dev jest @testing-library/react @testing-library/jest-dom
+git add package.json package-lock.json
+git commit -m "fix: add jest dependencies"
+git push
+```
 
-### Related Projects
+---
 
-- **[Project 1: Docker Hello App](../project-01-docker-hello-app)** - Foundation
-- **[Project 3: Docker Compose Fullstack](../project-03-docker-compose-fullstack)** - Next (coming soon)
+### Build Fails After Tests Pass
+
+**Check:**
+1. Dockerfile syntax errors
+2. Missing files referenced in Dockerfile
+3. Docker build context issues
+
+```bash
+# Test Docker build locally
+cd backend
+docker build -t test-backend .
+
+cd ../frontend
+docker build -t test-frontend .
+```
+
+---
+
+## Next Project
+
+**[Project 3: Docker Compose Fullstack](../project-03-docker-compose-fullstack)**
+
+You'll learn:
+- Multi-container orchestration
+- Service networking
+- Volumes and data persistence
+- Environment-specific configs
+- Database integration (PostgreSQL, Redis)
 
 ---
 
 ## Resources & References
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+### Official Documentation
+- [GitHub Actions Docs](https://docs.github.com/en/actions)
 - [pytest Documentation](https://docs.pytest.org/)
+- [Jest Documentation](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/react)
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+
+### Best Practices Guides
+- [GitHub Actions Best Practices](https://docs.github.com/en/actions/learn-github-actions/best-practices-for-github-actions)
+- [Effective pytest](https://pragprog.com/titles/bopytest/python-testing-with-pytest/)
+- [Testing React Applications](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
+
+### Related Articles
+- [CI/CD Pipeline Best Practices](https://about.gitlab.com/topics/ci-cd/best-practices/)
+- [Test Coverage vs Code Quality](https://martinfowler.com/bliki/TestCoverage.html)
 
 ---
 
 ## Author
 
 **KODCHAMON BOONCHAN**  
-DevOps Learning Journey - Stage 2/10  
-[GitHub Profile](https://github.com/DiaBmond) | [Project Repository](https://github.com/DiaBmond/devops-projects)
+DevOps Learning Journey - Project 2/10 (Stage 1: Beginner)  
+[GitHub Profile](https://github.com/DiaBmond) | [All Projects](https://github.com/DiaBmond/devops-projects)
 
 ---
 
@@ -248,3 +348,14 @@ DevOps Learning Journey - Stage 2/10
 MIT License - Feel free to use this project for learning purposes.
 
 ---
+
+## Achievement Unlocked
+
+**CI/CD Fundamentals Mastered**
+- Built automated test pipeline
+- Integrated GitHub Actions
+- Measured test coverage
+- Implemented fail-fast pattern
+- Automated Docker builds
+
+**Ready for:** Project 3 - Docker Compose Fullstack 
