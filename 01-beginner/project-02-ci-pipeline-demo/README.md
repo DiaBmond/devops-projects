@@ -15,6 +15,3 @@
 
 * KODCHAMON BOONCHAN
 * Stage 2 DevOps
-
-
-*test ci

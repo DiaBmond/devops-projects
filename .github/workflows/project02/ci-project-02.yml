@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "01-beginner/project-02-ci-pipeline-demo/**"
-      - ".github/workflows/project2/ci-project-02.yml"
+      - ".github/workflows/project02/ci-project-02.yml"
 
   pull_request:
     branches: [main]
