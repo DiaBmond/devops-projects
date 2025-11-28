@@ -35,7 +35,7 @@ jobs:
       - name: Run tests
         run: |
           cd 01-beginner/project-02-ci-pipeline-demo/backend
-          pytest
+          pytest --cov --cov-report=html
 
       - name: Upload backend coverage
         uses: actions/upload-artifact@v4
