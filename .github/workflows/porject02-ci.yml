@@ -5,13 +5,13 @@ on:
     branches: [main]
     paths:
       - "01-beginner/project-02-ci-pipeline-demo/**"
-      - ".github/workflows/ci-project-02.yml"
+      - ".github/workflows/project02-ci.yml"
 
   pull_request:
     branches: [main]
     paths:
       - "01-beginner/project-02-ci-pipeline-demo/**"
-      - ".github/workflows/ci-project-02.yml"
+      - ".github/workflows/project02-ci.yml"
 
 jobs:
   test-backend:
@@ -29,12 +29,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
+          cd 01-beginner/project-02-ci-pipeline-demo/backend
           pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Run tests
         run: |
-          cd backend
+          cd 01-beginner/project-02-ci-pipeline-demo/backend
           pytest
 
   test-frontend:
@@ -50,16 +50,16 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: 01-beginner/project-02-ci-pipeline-demo/frontend/package-lock.json
 
       - name: Install dependencies
         run: |
-          cd frontend
+          cd 01-beginner/project-02-ci-pipeline-demo/frontend
           npm ci
 
       - name: Run tests
         run: |
-          cd frontend
+          cd 01-beginner/project-02-ci-pipeline-demo/frontend
           npm test
 
   build:
@@ -73,12 +73,12 @@ jobs:
 
       - name: Build backend image
         run: |
-          cd backend
+          cd 01-beginner/project-02-ci-pipeline-demo/backend
           docker build -t backend:${{ github.sha }} .
           echo "Backend image built successfully"
 
       - name: Build frontend image
         run: |
-          cd frontend
+          cd 01-beginner/project-02-ci-pipeline-demo/frontend
           docker build -t frontend:${{ github.sha }} .
           echo "Frontend image built successfully"
