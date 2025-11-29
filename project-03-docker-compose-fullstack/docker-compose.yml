@@ -52,8 +52,6 @@ services:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
-    ports:
-      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,23 +64,40 @@ services:
       - backend-network
       - frontend-network
 
-  # React Frontend (Development)
+  # React Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
     container_name: project3-frontend
-    ports:
-      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_API_URL=http://localhost/api
     stdin_open: true
     tty: true
     networks:
       - frontend-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: project3-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - frontend-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   backend-network:
