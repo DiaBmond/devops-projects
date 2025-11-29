@@ -59,15 +59,6 @@ docker-compose up --build
 
 ---
 
-### Cloud Providers
-
-| Provider | Services Used | Projects |
-|----------|---------------|----------|
-| **AWS** | VPC, EC2, EKS, RDS, S3, Route53, ECR | 4, 10 |
-| **LocalStack** | Local AWS simulation | 4 (optional) |
-
----
-
 ## Project Structure
 
 ```
@@ -143,7 +134,7 @@ git push origin feature/improve-project-3
 
 ---
 
-## 👤 Author
+## Author
 
 **KODCHAMON BOONCHAN (DiaBmond)**
 
@@ -268,25 +259,6 @@ Pipelines Built:        3
 2. **Review Issues** - Someone may have asked already
 3. **Open an Issue** - Describe your problem clearly
 4. **Join Community** - DevOps Slack channels
-
-### Common Questions
-
-**Q: Do I need to complete projects in order?**  
-A: Yes, for beginners. Each project builds on previous concepts.
-
-**Q: What if I get stuck?**  
-A: Check troubleshooting sections, review logs, search GitHub Issues, or ask for help.
-
-**Q: Can I use different technologies?**  
-A: Absolutely! Adapt projects to your preferred stack.
-
-**Q: How long does each project take?**  
-A: Varies by experience. Budget 5-15 hours per project for beginners.
-
-**Q: Do I need cloud credits?**  
-A: Not until Project 4. Projects 1-3 run entirely locally.
-
----
 
 ## Final Words
 

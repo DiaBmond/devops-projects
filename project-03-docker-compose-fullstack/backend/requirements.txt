@@ -1,0 +1,12 @@
+asgiref==3.11.0
+Django==5.2.8
+django-cors-headers==4.9.0
+djangorestframework==3.16.1
+sqlparse==0.5.3
+
+# PostgreSQL adapter
+psycopg2-binary==2.9.9
+
+# Redis cache
+django-redis==5.4.0
+redis==5.0.1
