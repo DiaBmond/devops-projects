@@ -1,574 +1,709 @@
-# Project 3: Docker Compose Fullstack (WIP)
+# Project 3: Docker Compose Fullstack
 
-> 🚧 **Status**: Planning Phase  
-> 📅 **Planned Start**: TBD  
-> 🎯 **Goal**: Build production-like multi-container environment
-
----
+![Docker](https://img.shields.io/badge/docker-24.0+-blue)
+![Docker Compose](https://img.shields.io/badge/docker--compose-v2-blue)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Node](https://img.shields.io/badge/node-20.x-green)
+![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue)
+![Redis](https://img.shields.io/badge/redis-7-red)
+![Nginx](https://img.shields.io/badge/nginx-alpine-green)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## Overview
 
-Full-stack application with multiple services orchestrated using Docker Compose, demonstrating real-world application architecture with database, caching, and reverse proxy.
+A **production-like full-stack application** demonstrating multi-container orchestration with Docker Compose. This project integrates PostgreSQL database, Redis cache, Django backend, React frontend, and Nginx reverse proxy.
 
-This project applies all best practices from Project 1 and integrates CI/CD from Project 2.
+**Tech Stack:**
+- **Frontend**: React 18 + TypeScript
+- **Backend**: Python 3.12 + Django 5.0
+- **Database**: PostgreSQL 16
+- **Cache**: Redis 7
+- **Reverse Proxy**: Nginx (Alpine)
+- **Orchestration**: Docker Compose
+
+**Learning Path**: This is **Project 3 of 10** in the DevOps Roadmap (Stage 1: Beginner).
 
 ---
 
-## Planned Architecture
+## Architecture
 ```
-┌─────────────────────────────────────────────────┐
-│         FULL-STACK ARCHITECTURE                 │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│      FULL-STACK ARCHITECTURE            │
+└─────────────────────────────────────────┘
 
-     [User Browser]
-            │
-            ▼
-     ┌──────────────┐
-     │    Nginx     │  Reverse Proxy
-     │   Port 80    │  SSL-ready
-     └──────┬───────┘
-            │
-      ┌─────┴─────┐
-      │           │
-      ▼           ▼
-┌──────────┐  ┌──────────┐
-│ Frontend │  │ Backend  │
-│  React   │  │  Django  │
-│ :3000    │  │  :8000   │
-└──────────┘  └────┬─────┘
-                   │
-              ┌────┴────┐
-              │         │
-              ▼         ▼
-        ┌──────────┐ ┌──────────┐
-        │PostgreSQL│ │  Redis   │
-        │  :5432   │ │  :6379   │
-        └────┬─────┘ └────┬─────┘
-             │            │
-        [Volume]      [Volume]
-     (data persist) (cache data)
+          [User Browser]
+                ↓
+          [Nginx :80]  ← Reverse Proxy
+                ↓
+          ┌─────┴─────┐
+          ↓           ↓
+    [Frontend]   [Backend API]
+      :3000        :8000
+                    ↓
+              ┌─────┴─────┐
+              ↓           ↓
+        [PostgreSQL]  [Redis]
+          :5432       :6379
+              ↓           ↓
+          [Volume]    [Volume]
+      (data persist) (cache)
 ```
 
----
-
-## Planned Features
-
-### Core Services
-- ✅ **Backend API** - Django REST Framework
-- ✅ **Frontend** - React TypeScript SPA
-- ✅ **Database** - PostgreSQL (persistent storage)
-- ✅ **Cache** - Redis (session & data caching)
-- ✅ **Reverse Proxy** - Nginx (routing & load balancing)
-
-### DevOps Features
-- ✅ **Multi-stage Builds** - Optimized Docker images
-- ✅ **Health Checks** - All services monitored
-- ✅ **Non-root Users** - Security best practices
-- ✅ **Volume Management** - Data persistence
-- ✅ **Network Isolation** - Custom Docker networks
-- ✅ **Environment Variables** - Configuration management
-- ✅ **Development Mode** - Hot reload for coding
-- ✅ **Production Mode** - Optimized for deployment
-
----
-
-## Skills to Learn
-
-### Docker Compose
-- [ ] Service orchestration
-- [ ] Multi-container networking
-- [ ] Volume management (named volumes, bind mounts)
-- [ ] Environment variable handling
-- [ ] Service dependencies (depends_on, healthcheck)
-- [ ] Override files (docker-compose.override.yml)
-- [ ] Resource limits
-
-### Database Integration
-- [ ] PostgreSQL setup in containers
-- [ ] Database initialization scripts
-- [ ] Connection pooling
-- [ ] Data persistence strategies
-- [ ] Database migrations
-- [ ] Backup strategies
-
-### Caching Layer
-- [ ] Redis integration
-- [ ] Session management
-- [ ] Data caching patterns
-- [ ] Cache invalidation
-- [ ] Redis persistence options
-
-### Reverse Proxy
-- [ ] Nginx configuration
-- [ ] Request routing
-- [ ] Load balancing basics
-- [ ] SSL/TLS setup (Let's Encrypt ready)
-- [ ] Static file serving
-- [ ] Proxy headers
-
-### Production Patterns
-- [ ] Logging strategy
-- [ ] Monitoring readiness
-- [ ] Graceful shutdown
-- [ ] Restart policies
-- [ ] Secret management
-- [ ] Multi-environment support
-
----
-
-## Planned Project Structure
+### Network Topology
 ```
-docker-compose-fullstack/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                # CI/CD pipeline (from Project 2)
-│
+backend-network:
+  - postgres
+  - redis
+  - backend
+
+frontend-network:
+  - backend
+  - frontend
+  - nginx
+```
+
+---
+
+## Learning Objectives
+
+After completing this project, you will understand:
+
+- **Multi-container orchestration** with Docker Compose
+- **Service dependencies** and health checks
+- **PostgreSQL** integration with Django
+- **Redis** caching implementation
+- **Nginx** as reverse proxy and load balancer
+- **Docker networks** for service isolation
+- **Volume management** for data persistence
+- **Environment variable** management
+- **Development vs Production** configurations
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- Docker Desktop installed ([Download](https://www.docker.com/products/docker-desktop/))
+- Docker Compose v2+
+- 4GB+ RAM available
+- Ports 80, 3000, 5432, 8000 available
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/DiaBmond/devops-projects.git
+cd devops-projects/project-03-docker-compose-fullstack
+```
+
+### 2. Setup Environment Variables
+```bash
+# Copy example env file
+cp .env.example .env
+
+# .env file contents (already set for development):
+# POSTGRES_DB=appdb
+# POSTGRES_USER=appuser
+# POSTGRES_PASSWORD=devpassword123
+# REDIS_PASSWORD=redispass123
+# DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+# DJANGO_DEBUG=True
+# DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend
+```
+
+**Important**: Never commit `.env` file to Git (already in `.gitignore`)
+
+### 3. Start All Services
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Or run in background
+docker-compose up -d --build
+```
+
+### 4. Access Application
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://localhost/ | React App (via Nginx) |
+| **Backend API** | http://localhost/api/ | Django API (via Nginx) |
+| **Health Check** | http://localhost/health | Nginx health endpoint |
+| **Direct Frontend** | http://localhost:3000 | React Dev Server (dev only) |
+| **Direct Backend** | http://localhost:8000 | Django Server (dev only) |
+
+**Expected Output:**
+```
+Frontend: "Hello World from Dockerized App!" with tech badges
+Backend API: {"message": "Hello World from Dockerized App!"}
+Health: healthy
+```
+
+---
+
+## Project Structure
+```
+project-03-docker-compose-fullstack/
 ├── backend/
-│   ├── Dockerfile                # Production (multi-stage)
-│   ├── Dockerfile.dev            # Development (hot reload)
-│   ├── requirements.txt
-│   ├── requirements-dev.txt
-│   ├── .dockerignore
+│   ├── api/                      # Django app
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── backend/                  # Django project
+│   │   ├── __init__.py
+│   │   ├── settings.py          # PostgreSQL + Redis config
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── tests/
+│   ├── Dockerfile               # Production-ready
 │   ├── manage.py
-│   ├── api/
-│   │   ├── settings/
-│   │   │   ├── base.py
-│   │   │   ├── development.py
-│   │   │   └── production.py
-│   │   ├── models.py            # Database models
-│   │   ├── views.py
-│   │   └── urls.py
-│   └── tests/
+│   ├── requirements.txt
+│   └── requirements-dev.txt
 │
 ├── frontend/
-│   ├── Dockerfile                # Production (Nginx)
-│   ├── Dockerfile.dev            # Development (React dev server)
-│   ├── .dockerignore
-│   ├── package.json
+│   ├── public/
 │   ├── src/
-│   │   ├── api/
-│   │   │   └── client.ts        # API integration
-│   │   ├── App.tsx
-│   │   └── config.ts            # Environment config
-│   └── public/
+│   │   ├── App.tsx              # Main component
+│   │   ├── App.css
+│   │   └── index.tsx
+│   ├── Dockerfile               # Production build
+│   ├── Dockerfile.dev           # Development with hot reload
+│   ├── package.json
+│   └── tsconfig.json
 │
 ├── nginx/
-│   ├── Dockerfile
-│   ├── nginx.conf                # Main config
-│   ├── conf.d/
-│   │   ├── default.conf         # Routing rules
-│   │   └── ssl.conf             # SSL config (future)
-│   └── html/
-│       └── 50x.html             # Error pages
+│   └── nginx.conf               # Reverse proxy configuration
 │
-├── postgres/
-│   ├── Dockerfile (optional)
-│   └── init/
-│       ├── 01-init.sql          # Schema
-│       └── 02-seed.sql          # Sample data
-│
-├── redis/
-│   └── redis.conf               # Redis configuration
-│
-├── docker-compose.yml           # Production setup
-├── docker-compose.dev.yml       # Development overrides
-├── docker-compose.test.yml      # Testing environment
-│
+├── docker-compose.yml           # Orchestration config
 ├── .env.example                 # Environment template
-├── .env.dev                     # Development env (gitignored)
-├── .env.prod                    # Production env (gitignored)
-│
-├── scripts/
-│   ├── setup.sh                 # Initial setup
-│   ├── backup-db.sh             # Database backup
-│   ├── restore-db.sh            # Database restore
-│   └── healthcheck.sh           # Manual health check
-│
+├── .env                         # Actual env (gitignored)
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## Planned docker-compose.yml Structure
+## Services Overview
+
+### 1. PostgreSQL (Database)
 ```yaml
-version: '3.9'
+Container: project3-postgres
+Image: postgres:16-alpine
+Port: 5432
+Volume: postgres_data
+Health Check: pg_isready
+```
 
-services:
-  # Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: fullstack-db
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./postgres/init:/docker-entrypoint-initdb.d
-    networks:
-      - backend-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+**Features:**
+- Persistent data storage
+- Health checks
+- Automatic database creation
+- Resource limits
 
-  # Cache
-  redis:
-    image: redis:7-alpine
-    container_name: fullstack-cache
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    networks:
-      - backend-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
+### 2. Redis (Cache)
+```yaml
+Container: project3-redis
+Image: redis:7-alpine
+Port: 6379 (internal)
+Volume: redis_data
+Health Check: redis-cli ping
+```
 
-  # Backend API
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: fullstack-backend
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-      - REDIS_URL=redis://redis:6379/0
-    volumes:
-      - ./backend:/app
-      - backend_static:/app/staticfiles
-    networks:
-      - backend-network
-      - frontend-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+**Features:**
+- Password authentication
+- AOF persistence
+- Health checks
+- Resource limits
 
-  # Frontend
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: fullstack-frontend
-    depends_on:
-      - backend
-    networks:
-      - frontend-network
+### 3. Django Backend (API)
+```yaml
+Container: project3-backend
+Build: ./backend/Dockerfile
+Port: 8000
+Depends on: postgres, redis
+```
 
-  # Reverse Proxy
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: fullstack-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - frontend
-      - backend
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - backend_static:/static
-    networks:
-      - frontend-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+**Features:**
+- PostgreSQL database integration
+- Redis cache integration
+- Automatic migrations on startup
+- Environment-based configuration
+- Hot reload in development
 
-networks:
-  backend-network:
-    driver: bridge
-  frontend-network:
-    driver: bridge
+**API Endpoints:**
+- `GET /` - Hello World message
+- `GET /admin/` - Django admin panel
 
-volumes:
-  postgres_data:
-  redis_data:
-  backend_static:
+### 4. React Frontend (UI)
+```yaml
+Container: project3-frontend
+Build: ./frontend/Dockerfile.dev
+Port: 3000
+```
+
+**Features:**
+- TypeScript support
+- Hot module replacement
+- Environment variables
+- Connects to backend via Nginx
+
+### 5. Nginx (Reverse Proxy)
+```yaml
+Container: project3-nginx
+Image: nginx:alpine
+Port: 80
+```
+
+**Routing:**
+- `/` → Frontend (React)
+- `/api/` → Backend (Django)
+- `/health` → Health check
+
+---
+
+## Docker Compose Commands
+
+### Basic Operations
+```bash
+# Start all services
+docker-compose up
+
+# Start in background
+docker-compose up -d
+
+# Build and start
+docker-compose up --build
+
+# Stop services
+docker-compose stop
+
+# Stop and remove containers
+docker-compose down
+
+# Stop and remove containers + volumes (deletes data)
+docker-compose down -v
+
+# View logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f backend
+```
+
+### Service Management
+```bash
+# List running services
+docker-compose ps
+
+# Check service health
+docker-compose ps
+
+# Restart specific service
+docker-compose restart backend
+
+# Rebuild specific service
+docker-compose up -d --build backend
+
+# Scale service (if configured)
+docker-compose up -d --scale backend=3
+```
+
+### Database Operations
+```bash
+# Connect to PostgreSQL
+docker-compose exec postgres psql -U appuser -d appdb
+
+# View tables
+docker-compose exec postgres psql -U appuser -d appdb -c "\dt"
+
+# Run migrations manually
+docker-compose exec backend python manage.py migrate
+
+# Create superuser
+docker-compose exec backend python manage.py createsuperuser
+```
+
+### Redis Operations
+```bash
+# Connect to Redis
+docker-compose exec redis redis-cli -a redispass123
+
+# Test Redis
+docker-compose exec redis redis-cli -a redispass123 PING
+# Response: PONG
+
+# Set/Get keys
+docker-compose exec redis redis-cli -a redispass123
+> SET test "Hello Redis"
+> GET test
+```
+
+### Container Inspection
+```bash
+# View container stats
+docker stats
+
+# Inspect container
+docker inspect project3-backend
+
+# Execute command in container
+docker-compose exec backend bash
+
+# View environment variables
+docker-compose exec backend env
 ```
 
 ---
 
-## Planned Environment Variables
+## Development Workflow
+
+### 1. Start Development Environment
 ```bash
-# .env.example
+# Start all services with logs
+docker-compose up --build
+```
 
-# Application
-APP_NAME=fullstack-demo
-ENVIRONMENT=development
+### 2. Make Code Changes
 
-# Database
-DB_NAME=appdb
-DB_USER=appuser
-DB_PASSWORD=changeme_in_production
-DB_HOST=postgres
-DB_PORT=5432
+**Backend changes:**
+- Edit files in `backend/`
+- Django auto-reloads (no restart needed)
 
-# Redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-REDIS_DB=0
+**Frontend changes:**
+- Edit files in `frontend/src/`
+- React hot-reloads automatically
 
-# Django
-DJANGO_SECRET_KEY=changeme_in_production
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+**Nginx config changes:**
+- Edit `nginx/nginx.conf`
+- Restart nginx: `docker-compose restart nginx`
+
+### 3. View Logs
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
+
+### 4. Test Changes
+```bash
+# Backend API
+curl http://localhost/api/
 
 # Frontend
-REACT_APP_API_URL=http://localhost/api
+open http://localhost/
+
+# Health check
+curl http://localhost/health
 ```
 
 ---
 
-## Planned Improvements from Project 1
+## Testing
 
-### Backend Dockerfile (Multi-stage)
-```dockerfile
-# STAGE 1: Builder
-FROM python:3.12-slim AS builder
-WORKDIR /build
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+### Backend Tests
+```bash
+# Run pytest
+docker-compose exec backend pytest
 
-# STAGE 2: Runtime
-FROM python:3.12-slim
-RUN useradd -m -u 1001 appuser
-WORKDIR /app
-COPY --from=builder /root/.local /home/appuser/.local
-COPY --chown=appuser:appuser . .
-USER appuser
-HEALTHCHECK --interval=30s CMD curl -f http://localhost:8000/health || exit 1
-CMD ["gunicorn", "api.wsgi:application", "--bind", "0.0.0.0:8000"]
+# With coverage
+docker-compose exec backend pytest --cov
+
+# Specific test file
+docker-compose exec backend pytest tests/test_api.py -v
 ```
 
-### Security Enhancements
-- ✅ Non-root users in all containers
-- ✅ Read-only root filesystem (where possible)
-- ✅ No privileged containers
-- ✅ Secrets via environment variables (not hardcoded)
-- ✅ Network segmentation (backend/frontend networks)
+### Frontend Tests
+```bash
+# Run Jest tests
+docker-compose exec frontend npm test
 
-### Health Checks
-- ✅ All services have health checks
-- ✅ `depends_on` uses condition: service_healthy
-- ✅ Proper startup order
+# With coverage
+docker-compose exec frontend npm test -- --coverage
+```
 
-### Resource Management
+---
+
+## Troubleshooting
+
+### Port Already in Use
+
+**Error:**
+```
+Error starting userland proxy: listen tcp4 0.0.0.0:80: bind: address already in use
+```
+
+**Solution:**
+```bash
+# Find process using port
+lsof -i :80
+
+# Kill process
+kill -9 <PID>
+
+# Or change port in docker-compose.yml
+ports:
+  - "8080:80"
+```
+
+### Database Connection Failed
+
+**Error:**
+```
+django.db.utils.OperationalError: connection to server failed
+```
+
+**Solution:**
+```bash
+# Check postgres is healthy
+docker-compose ps
+
+# Check logs
+docker-compose logs postgres
+
+# Restart services
+docker-compose down
+docker-compose up -d
+```
+
+### Frontend Cannot Reach Backend
+
+**Error:**
+```
+Failed to fetch
+```
+
+**Solution:**
+1. Check backend is running: `curl http://localhost/api/`
+2. Check nginx config: `docker-compose exec nginx cat /etc/nginx/nginx.conf`
+3. Check browser console for CORS errors
+4. Verify frontend uses `/api/` not `http://localhost:8000`
+
+### Container Exits Immediately
+
+**Check logs:**
+```bash
+docker-compose logs <service-name>
+```
+
+**Common issues:**
+- Missing dependencies
+- Configuration errors
+- Port conflicts
+- Volume permission issues
+
+### Reset Everything
+```bash
+# Nuclear option - reset everything
+docker-compose down -v
+docker system prune -a --volumes
+docker-compose up --build
+```
+
+---
+
+## Environment Variables
+
+### PostgreSQL
+```bash
+POSTGRES_DB=appdb              # Database name
+POSTGRES_USER=appuser          # Username
+POSTGRES_PASSWORD=password123   # Password
+```
+
+### Redis
+```bash
+REDIS_PASSWORD=redispass123    # Redis password
+```
+
+### Django
+```bash
+DJANGO_SECRET_KEY=secret-key-here
+DJANGO_DEBUG=True              # True for dev, False for prod
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend
+```
+
+### Frontend
+```bash
+REACT_APP_API_URL=http://localhost/api  # Backend API URL
+```
+
+---
+
+## Production Considerations
+
+### Security Improvements
 ```yaml
+# Use secrets instead of env vars
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+# Set resource limits
 deploy:
   resources:
     limits:
       cpus: '0.5'
       memory: 512M
-    reservations:
-      cpus: '0.25'
-      memory: 256M
+```
+
+### Performance Optimization
+```yaml
+# Use production Dockerfile for frontend
+frontend:
+  build:
+    context: ./frontend
+    dockerfile: Dockerfile  # Multi-stage build
+
+# Enable Nginx caching
+# Add to nginx.conf
+proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m;
+```
+
+### Monitoring
+```yaml
+# Add health checks to all services
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
 ```
 
 ---
 
-## Planned Testing Strategy
+## What You Learned
 
-### Local Testing
-```bash
-# Start all services
-docker-compose up --build
+### Docker Concepts
 
-# Run backend tests
-docker-compose exec backend pytest
+- **Multi-container orchestration**: Managing 5 services together
+- **Service dependencies**: Using `depends_on` with health checks
+- **Networks**: Isolating services with custom networks
+- **Volumes**: Persisting data across container restarts
+- **Health checks**: Monitoring service availability
 
-# Run frontend tests
-docker-compose exec frontend npm test
+### Infrastructure Patterns
 
-# Check service health
-docker-compose ps
-```
+- **Reverse Proxy**: Nginx routing requests
+- **Database Integration**: PostgreSQL with Django
+- **Caching Layer**: Redis for performance
+- **Environment Management**: Using .env files
+- **Development vs Production**: Different configurations
 
-### CI/CD Integration
-- [ ] All Project 2 tests still pass
-- [ ] Database migration tests
-- [ ] Integration tests (API + DB)
-- [ ] End-to-end tests (optional)
+### Best Practices
+
+- **Security**: Password protection, non-root users
+- **Data Persistence**: Named volumes for databases
+- **Service Discovery**: Using service names as hostnames
+- **Configuration Management**: Environment variables
+- **Logging**: Centralized log viewing
 
 ---
 
-## Planned Commands
-
-### Development
+## Common Commands Reference
 ```bash
-# Start development environment
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Quick reference card
+docker-compose up -d              # Start services
+docker-compose down               # Stop services
+docker-compose logs -f            # View logs
+docker-compose ps                 # Service status
+docker-compose restart <service>  # Restart service
+docker-compose exec <service> sh  # Shell into container
 
-# View logs
-docker-compose logs -f [service_name]
-
-# Execute commands in containers
-docker-compose exec backend python manage.py migrate
-docker-compose exec backend python manage.py createsuperuser
+# Database
 docker-compose exec postgres psql -U appuser -d appdb
 
-# Rebuild specific service
-docker-compose up -d --build backend
+# Backend
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py shell
 
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes (⚠️ deletes data!)
-docker-compose down -v
-```
-
-### Production
-```bash
-# Start production environment
-docker-compose up -d
-
-# Scale services (if needed)
-docker-compose up -d --scale backend=3
-
-# Backup database
-./scripts/backup-db.sh
-
-# View resource usage
-docker stats
+# Redis
+docker-compose exec redis redis-cli -a redispass123
 ```
 
 ---
 
-## Expected Challenges & Solutions
+## Next Steps
 
-### Challenge 1: Database Connection Timing
-**Problem**: Backend starts before Postgres is ready  
-**Solution**: Use `depends_on` with health checks
+### Improvements to Try
 
-### Challenge 2: Data Persistence
-**Problem**: Data lost on container restart  
-**Solution**: Named volumes for Postgres & Redis
+1. **Add SSL/TLS** - Configure Nginx with HTTPS
+2. **Add Monitoring** - Integrate Prometheus + Grafana
+3. **Add Logging** - Centralized logging with ELK/Loki
+4. **Add CI/CD** - Automated testing and deployment
+5. **Add Backups** - Database backup scripts
+6. **Add Scaling** - Multiple backend instances
 
-### Challenge 3: Network Communication
-**Problem**: Services can't reach each other  
-**Solution**: Custom bridge networks, service names as DNS
+### Next Project
 
-### Challenge 4: Environment Management
-**Problem**: Different configs for dev/prod  
-**Solution**: .env files + docker-compose overrides
+**[Project 4: Infrastructure as Code with Terraform](../project-04-terraform-aws-infra)**
 
----
-
-## Success Criteria
-```
-☐ All 5 services start successfully
-☐ Frontend accessible via Nginx (port 80)
-☐ Backend connects to PostgreSQL
-☐ Redis caching works
-☐ Data persists across restarts
-☐ Health checks all passing
-☐ All tests pass (backend + frontend)
-☐ CI/CD pipeline updated and working
-☐ Documentation complete
-☐ Resource usage optimized (<2GB total)
-```
-
----
-
-## Estimated Timeline
-
-- **Day 1**: Docker Compose setup + PostgreSQL integration
-- **Day 2**: Redis + Backend improvements (multi-stage, health checks)
-- **Day 3**: Nginx setup + Testing + Documentation
-
-**Total**: 2-3 days
-
----
-
-## Skills Progression
-```
-Project 1: Docker basics
-    ↓
-Project 2: CI/CD automation
-    ↓
-Project 3: Multi-container orchestration ← (YOU ARE HERE)
-    ↓
-Project 4: Infrastructure as Code (Terraform)
-```
+You'll learn:
+- Terraform basics
+- AWS infrastructure provisioning
+- VPC, Subnets, Security Groups
+- Infrastructure automation
+- State management
 
 ---
 
 ## Resources & References
 
-### To Study Before Starting
-- [ ] [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [ ] [PostgreSQL Docker Guide](https://hub.docker.com/_/postgres)
-- [ ] [Redis Docker Guide](https://hub.docker.com/_/redis)
-- [ ] [Nginx Reverse Proxy Tutorial](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
-- [ ] [Django Database Configuration](https://docs.djangoproject.com/en/5.0/ref/databases/)
+### Official Documentation
+- [Docker Compose Docs](https://docs.docker.com/compose/)
+- [PostgreSQL Docker](https://hub.docker.com/_/postgres)
+- [Redis Docker](https://hub.docker.com/_/redis)
+- [Nginx Docs](https://nginx.org/en/docs/)
+- [Django Documentation](https://docs.djangoproject.com/)
+- [React Documentation](https://react.dev/)
 
-### Tools to Install
-- [ ] Docker Desktop (already have ✅)
-- [ ] Docker Compose (included with Docker Desktop ✅)
-- [ ] PostgreSQL Client: `brew install postgresql@16` (for psql commands)
-- [ ] Redis CLI: `brew install redis` (for redis-cli commands)
-
----
-
-## Future Enhancements (Post Project 3)
-
-- 🔐 **Add SSL/TLS** - Let's Encrypt integration
-- 📊 **Add Monitoring** - Prometheus + Grafana (Project 6 preview)
-- 🔄 **Add Message Queue** - RabbitMQ or Kafka
-- 🗄️ **Add Backup Strategy** - Automated database backups
-- 🚀 **Add Auto-scaling** - Docker Swarm or Kubernetes prep
-- 🔍 **Add Logging** - ELK Stack or Loki
-- 🛡️ **Add Security Scanning** - Trivy for container scanning
-
----
-
-## Notes & Ideas
-
-### Things to Remember
-- Keep it simple first, optimize later
-- Test each service individually before combining
-- Use health checks for all services
-- Document environment variables clearly
-- Commit often with clear messages
-
-### Questions to Answer During Build
-- How to handle database migrations in containers?
-- Best practice for secret management?
-- How to debug network issues between containers?
-- When to use bind mounts vs named volumes?
+### Tutorials
+- [Docker Compose Tutorial](https://docs.docker.com/compose/gettingstarted/)
+- [Nginx Reverse Proxy Guide](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+- [Django + PostgreSQL Setup](https://docs.djangoproject.com/en/5.0/ref/databases/#postgresql-notes)
 
 ---
 
 ## Author
 
-**KODCHAMON BOONCHAN**  
-DevOps Learning Journey - Stage 1 (Project 3/10)
-
-**Current Status**: Planning Phase  
-**Next Action**: Review resources, then start implementation
+**KODCHAMON BOONCHAN (DiaBmond)**  
+DevOps Learning Journey - Project 3/10 (Stage 1: Beginner)  
+[GitHub Profile](https://github.com/DiaBmond) | [All Projects](https://github.com/DiaBmond/devops-projects)
 
 ---
 
-## Changelog
+## License
 
-- **2024-XX-XX**: Initial planning document created
-- **2024-XX-XX**: (Will update when starting implementation)
-- **2024-XX-XX**: (Will update when completed)
+MIT License - Feel free to use this project for learning purposes.
 
 ---
 
-**This is a planning document. Will be updated as project progresses.**
+## Achievement Unlocked
+
+**Full-Stack Orchestration Mastered**
+- Deployed multi-container application
+- Integrated database and cache
+- Configured reverse proxy
+- Managed service dependencies
+- Implemented health checks
+- Applied production patterns
+
+**Ready for:** Project 4 - Infrastructure as Code
+
+---
+
+## Support
+
+Found a bug or have a question?
+1. Check [Troubleshooting](#troubleshooting) section
+2. Review logs: `docker-compose logs`
+3. Open an issue on [GitHub](https://github.com/DiaBmond/devops-projects/issues)
+
+---
+
+**Happy Learning!**
