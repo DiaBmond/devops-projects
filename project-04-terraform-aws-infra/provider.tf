@@ -4,7 +4,7 @@
 
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -14,13 +14,9 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-southeast-1"  # Singapore
-  
+  region = var.aws_region # ใช้ variable แทน hardcode
+
   default_tags {
-    tags = {
-      Project     = "DevOps-Learning"
-      ManagedBy   = "Terraform"
-      Environment = "Development"
-    }
+    tags = var.common_tags # ใช้ variable
   }
 }

@@ -1,0 +1,33 @@
+# ========================================
+# Terraform Variables - Example Configuration
+# ========================================
+# Copy this file to terraform.tfvars and customize
+
+# Project Configuration
+project_name = "devops-project4"
+environment  = "dev"
+
+# AWS Configuration
+aws_region        = "ap-southeast-1"
+availability_zone = "ap-southeast-1a"
+
+# Network Configuration
+vpc_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+
+# EC2 Configuration
+instance_type = "t2.micro"
+key_name      = "devops-project4-key"
+
+# Security Configuration
+# ⚠️ IMPORTANT: Change this to your IP in production!
+# Find your IP: curl ifconfig.me
+allowed_ssh_ips = ["0.0.0.0/0"]
+
+# Tags
+common_tags = {
+  Project     = "DevOps-Learning"
+  ManagedBy   = "Terraform"
+  Environment = "Development"
+  Owner       = "Your-Name"
+}

@@ -1,7 +1,6 @@
 # ========================================
 # Data Source: AMI
 # ========================================
-# หา Amazon Linux 2 AMI ล่าสุด
 
 data "aws_ami" "amazon_linux" {
   most_recent = true
@@ -21,16 +20,14 @@ data "aws_ami" "amazon_linux" {
 # ========================================
 # EC2 Instance
 # ========================================
-# Virtual Server
 
 resource "aws_instance" "web" {
   ami                    = data.aws_ami.amazon_linux.id
-  instance_type          = "t2.micro" # Free tier
+  instance_type          = var.instance_type # ใช้ variable
+  key_name               = var.key_name      # ใช้ variable
   subnet_id              = aws_subnet.public.id
-  key_name               = "devops-project4-key"
   vpc_security_group_ids = [aws_security_group.web.id]
 
-  # User Data - รันตอน boot
   user_data = <<-EOF
             #!/bin/bash
             yum update -y
@@ -42,7 +39,7 @@ resource "aws_instance" "web" {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>DevOps Project 4</title>
+                <title>${var.project_name}</title>
                 <style>
                     body {
                         font-family: Arial, sans-serif;
@@ -66,11 +63,16 @@ resource "aws_instance" "web" {
                         margin: 10px;
                         display: inline-block;
                     }
+                    .info {
+                        margin-top: 30px;
+                        font-size: 16px;
+                        opacity: 0.9;
+                    }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    <h1>DevOps Project 4</h1>
+                    <h1>${var.project_name}</h1>
                     <p>Infrastructure as Code with Terraform</p>
                     <div>
                         <span class="tech">Terraform</span>
@@ -81,6 +83,11 @@ resource "aws_instance" "web" {
                     <p style="margin-top: 30px; font-size: 18px;">
                         Server deployed successfully!
                     </p>
+                    <div class="info">
+                        <p>Environment: ${var.environment}</p>
+                        <p>Region: ${var.aws_region}</p>
+                        <p>Instance: ${var.instance_type}</p>
+                    </div>
                 </div>
             </body>
             </html>
@@ -88,6 +95,6 @@ HTML
             EOF
 
   tags = {
-    Name = "devops-web-server"
+    Name = "${var.project_name}-web-server"
   }
 }
